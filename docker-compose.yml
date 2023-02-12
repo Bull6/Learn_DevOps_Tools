@@ -47,6 +47,42 @@ services:
     networks:
       - test
     
+  prometheus:
+    depends_on:
+      - postgres
+    image: bitnami/prometheus
+    volumes:
+      - ./prometheus-config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    links:
+      - postgres:db
+    ports:
+      - 9090:9090
+    restart: always
+    networks:
+      - test
+  
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter
+    ports:
+      - 9187:9187
+    environment:
+      DATA_SOURCE_NAME: "postgresql://test:123456@postgres:5432/testDB?sslmode=disable"
+    links:
+      - postgres
+      - prometheus
+    networks:
+      - test
+  
+  grafana:
+    image: grafana/grafana
+    ports:
+      - 3000:3000
+    depends_on:
+      - prometheus
+    networks:
+      - test
+
+
 
 networks:
   test:
