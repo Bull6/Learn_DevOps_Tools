@@ -1,2 +1,4 @@
 !PG_data/
 PG_data/*
+!logs/
+logs/*
