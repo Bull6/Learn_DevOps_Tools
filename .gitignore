@@ -5,3 +5,5 @@
 /logs/*
 /grafana/lib/*
 /pgadmin/*
+/keycloak-containers/*
+/docker-postgresql-multiple-databases/*
