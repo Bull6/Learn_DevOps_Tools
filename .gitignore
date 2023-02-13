@@ -1,4 +1,7 @@
-!PG_data/
-PG_data/*
-!logs/
-logs/*
+!/
+/.env
+/test/*
+/PG_data/*
+/logs/*
+/grafana/lib/*
+/pgadmin/*
