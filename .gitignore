@@ -1,0 +1,9 @@
+!/
+/.env
+/test/*
+/PG_data/*
+/logs/*
+/grafana/lib/*
+/pgadmin/*
+/keycloak-containers/*
+/docker-postgresql-multiple-databases/*
