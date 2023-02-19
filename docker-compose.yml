@@ -115,8 +115,8 @@ services:
       KEYCLOAK_PASSWORD: ${KEYCLOAK_PASSWORD}
     ports:
       - "8087:8080"
-    volumes:
-      - ./keycloak/standalone.xml:/opt/jboss/keycloak/standalone/configuration/standalone.xml
+    # volumes:
+    #   - ./keycloak/standalone.xml:/opt/jboss/keycloak/standalone/configuration/standalone.xml
     restart: unless-stopped
     depends_on:
       - postgres
