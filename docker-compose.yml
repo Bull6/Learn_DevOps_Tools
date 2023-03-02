@@ -7,11 +7,14 @@ services:
     hostname: nginx
     depends_on:
       - pgadmin
+    labels:
+      logging: "promtail"
+      logging_jobname: "containerlogs"
     ports:
       - 80:80
     volumes:
       - ./nginx/:/etc/nginx/conf.d/
-      - ./logs/nginx:/var/log/nginx
+      # - ./logs/nginx:/var/log/nginx
     restart: always
     networks:
       - test
@@ -20,8 +23,11 @@ services:
     image: postgres
     container_name: postgres
     hostname: postgres
+    labels:
+      logging: "promtail"
+      logging_jobname: "containerlogs"
     ports: 
-      - "5432:5432"
+      - 5432:5432
     environment:
       POSTGRES_USER: ${POSTGRESQL_USER}
       POSTGRES_PASSWORD: ${POSTGRESQL_PASS}
@@ -39,6 +45,9 @@ services:
     image: dpage/pgadmin4
     container_name: pgadmin
     hostname: pgadmin
+    labels:
+      logging: "promtail"
+      logging_jobname: "containerlogs"
     links:
       - postgres:db
     environment:
@@ -50,7 +59,7 @@ services:
     volumes:
       - ./pgadmin:/var/lib/pgadmin
     ports:
-     - "5050:80"
+     - 5050:80
     depends_on:
       - postgres
     restart: always
@@ -61,6 +70,9 @@ services:
     image: bitnami/prometheus
     container_name: prometheus
     hostname: prometheus
+    labels:
+      logging: "promtail"
+      logging_jobname: "containerlogs"
     volumes:
       - ./prometheus-config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     links:
@@ -91,6 +103,9 @@ services:
     image: grafana/grafana
     container_name: grafana
     hostname: grafana
+    labels:
+      logging: "promtail"
+      logging_jobname: "containerlogs"
     ports:
       - 3000:3000
     volumes:
@@ -104,20 +119,22 @@ services:
       - test
 
   promtail:
-    image: grafana/promtail:2.7.3
+    image: grafana/promtail
     container_name: promtail
     volumes:
-      - ./logs/loki:/var/log
+    #  - ./logs/nginx:/var/log
       - ./promtail:/etc/promtail
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
     command: -config.file=/etc/promtail/config.yml
     networks:
       - test
 
   loki:
-    image: grafana/loki:2.7.3
+    image: grafana/loki
     container_name: loki
     ports:
-      - "3100:3100"
+      - 3100:3100
     command: -config.file=/etc/loki/local-config.yaml
     volumes:
       - ./loki:/etc/loki
@@ -127,6 +144,9 @@ services:
   keycloak:
     image: jboss/keycloak:${KEYCLOAK_VERSION}
     container_name: keycloak
+    labels:
+      logging: "promtail"
+      logging_jobname: "containerlogs"
     environment:
       PROXY_ADDRESS_FORWARDING: true
       DB_VENDOR: postgres
@@ -139,7 +159,7 @@ services:
       #KEYCLOAK_HTTP_PORT: 8087
     command: ["-Djboss.http.port=8087"]
     ports:
-       - "8087:8087"
+       - 8087:8087
     # volumes:
     #   - ./keycloak/standalone.xml:/opt/jboss/keycloak/standalone/configuration/standalone.xml
     restart: unless-stopped
