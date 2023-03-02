@@ -1,7 +1,7 @@
 !/
 /.env
 /test/*
-/PG_data/*
+/PostgreSQL/PG_data*
 /logs/*
 /grafana/lib/*
 /pgadmin/*
