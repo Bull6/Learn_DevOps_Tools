@@ -28,7 +28,9 @@ services:
       POSTGRES_DB: ${POSTGRESQL_DB}
       PGDATA: "/var/lib/postgresql/data/pgdata"
     volumes:
-      - ./PG_data/:/var/lib/postgresql/data
+      - ./PostgreSQL/PG_data:/var/lib/postgresql/data
+      # copy the sql script to create tables
+      - ./PostgreSQL/Migration/create_databases.sql:/docker-entrypoint-initdb.d/create_databases.sql
     restart: always
     networks:
       - test
@@ -100,7 +102,28 @@ services:
       - prometheus
     networks:
       - test
-    
+
+  promtail:
+    image: grafana/promtail:2.7.3
+    container_name: promtail
+    volumes:
+      - ./logs/loki:/var/log
+      - ./promtail:/etc/promtail
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      - test
+
+  loki:
+    image: grafana/loki:2.7.3
+    container_name: loki
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./loki:/etc/loki
+    networks:
+      - test
+
   keycloak:
     image: jboss/keycloak:${KEYCLOAK_VERSION}
     container_name: keycloak
@@ -113,8 +136,10 @@ services:
       DB_PASSWORD: ${POSTGRESQL_PASS}
       KEYCLOAK_USER: ${KEYCLOAK_USER}
       KEYCLOAK_PASSWORD: ${KEYCLOAK_PASSWORD}
+      #KEYCLOAK_HTTP_PORT: 8087
+    command: ["-Djboss.http.port=8087"]
     ports:
-      - "8087:8080"
+       - "8087:8087"
     # volumes:
     #   - ./keycloak/standalone.xml:/opt/jboss/keycloak/standalone/configuration/standalone.xml
     restart: unless-stopped
@@ -127,4 +152,5 @@ services:
 
 networks:
   test:
-    external: true
+    name: test
+    driver: bridge
