@@ -1,0 +1,71 @@
+{{- $name:= "nginx" }}
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ $name }}
+  namespace: {{ .Values.metadata.namespace }}
+data:
+  proxy-connect-timeout: "10s"
+  proxy-read-timeout: "10s"
+  client-max-body-size: "2m"
+  default.conf: |
+    # upstream grafana {
+    # 		server grafana:3000;
+    # 		keepalive 15;
+    # 	}
+
+    # upstream keycloak {
+    # 		server keycloak:8087;
+    # 		keepalive 15;
+    # 	}
+
+
+    server {
+        listen       80;
+        listen  [::]:80;
+        server_name  localhost;
+        error_log  /var/log/nginx/error.log;
+        access_log /var/log/nginx/access.log;
+        #access_log  /var/log/nginx/host.access.log  main;
+
+        location  /pgadmin/ {                                                                    
+                proxy_pass http://pgadmin/;
+                proxy_redirect off;
+                proxy_set_header X-Script-Name /pgadmin;
+                proxy_set_header Host $host;
+        }
+
+        location  /auth {                                                                    
+                proxy_pass http://192.168.1.203:8087;
+            #     proxy_pass http://keycloak;
+                proxy_redirect off;
+                proxy_set_header X-Forwarded-For $proxy_protocol_addr; # To forward the original client's IP address 
+                proxy_set_header X-Forwarded-Proto $scheme; # to forward the  original protocol (HTTP or HTTPS)
+                proxy_set_header Host $host; # to forward the original host requested by the client 
+        }
+
+        location  /grafana/ {                                                                    
+                proxy_pass http://grafana:3000;
+                proxy_redirect off;
+                proxy_set_header X-Script-Name /grafana;
+                proxy_set_header Host $host;
+        }
+
+        location / {
+          root   /usr/share/nginx/html;
+          index  index.html index.htm;
+        }
+
+        error_page  404              /404.html;
+
+        #redirect server error pages to the static page /50x.html
+        
+        error_page   500 502 503 504  /50x.html;
+        
+        location = /50x.html {
+            root   /usr/share/nginx/html;
+        }
+
+    }
+

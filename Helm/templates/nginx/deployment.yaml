@@ -1,0 +1,32 @@
+{{- $name:= "nginx" }}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $name }}
+  namespace: {{ .Values.metadata.namespace }}
+  labels:
+    app: {{ $name }}
+spec:
+  replicas: {{ .Values.nginx.replicaset }}
+  selector:
+    matchLabels:
+      app: {{ $name }}
+  template:
+    metadata:
+      labels:
+        app: {{ $name }}
+    spec:
+      volumes:
+      - name: {{ $name }}-config
+        configMap:
+          name: {{ $name }}
+      containers:
+      - name: {{ $name }}
+        image: {{ .Values.nginx.container.image }}
+        ports:
+        - containerPort: {{ .Values.nginx.port }}
+        # volumeMounts:
+        # - name: {{ $name }}-config
+        #   mountPath: /etc/nginx/conf.d/default.conf
+        #   subPath: default.conf

@@ -1,0 +1,22 @@
+metadata:
+  namespace: test-helm
+
+nginx:
+  container:
+    image: nginx:latest
+  port: 80
+  replicaset: 1
+
+postgres:
+  configMap:
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: postres_pass
+    POSTGRES_DB: test_db
+    PGDATA: "/var/lib/postgresql/data/pgdata"
+
+  container:
+    image: postgres:latest
+  port: 5432
+
+  replicaCount: 1
+

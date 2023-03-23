@@ -1,0 +1,14 @@
+{{- $name := "postgres" }}
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $name }}
+spec:
+  selector:
+    app.kubernetes.io/name: {{ $name }}
+  ports:
+    - name: {{ $name }}
+      protocol: TCP
+      port: {{ .Values.postgres.port }}
+      targetPort: {{ $name }}

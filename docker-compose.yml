@@ -142,7 +142,7 @@ services:
       - test
 
   keycloak:
-    image: jboss/keycloak:${KEYCLOAK_VERSION}
+    image: dent875/keycloak:${KEYCLOAK_VERSION}
     container_name: keycloak
     labels:
       logging: "promtail"
