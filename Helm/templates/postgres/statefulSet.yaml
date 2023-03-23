@@ -1,0 +1,36 @@
+{{- $name := "postgres" }}
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ $name }}
+  namespace: {{ .Values.metadata.namespace }}
+  labels:
+    app: {{ $name }}
+spec:
+  replicas: {{ .Values.postgres.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ $name }}
+  serviceName: {{ $name }}
+  template:
+    metadata:
+      labels:
+        app: {{ $name }}
+    spec:
+      containers:
+      - name: {{ $name }}
+        image: {{ .Values.postgres.container.image }}
+        ports: 
+        - containerPort: {{ .Values.postgres.port }}
+          name: {{ $name }}
+        envFrom:
+            - configMapRef:
+                name: {{ $name }}
+        volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: {{ $name }}-pvc
+      volumes:
+        - name: {{ $name }}-pvc
+          persistentVolumeClaim:
+            claimName: {{ $name }}-pv-claim

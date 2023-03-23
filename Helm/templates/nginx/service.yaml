@@ -1,0 +1,15 @@
+{{- $name:= "nginx" }}
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $name }}
+  namespace: {{ .Values.metadata.namespace }}
+spec:
+  selector:
+    app.kubernetes.io/name: {{ $name }}
+  ports:
+    - name: {{ $name }}
+      protocol: TCP
+      port: {{ .Values.nginx.port }}
+      targetPort: {{ $name }}
