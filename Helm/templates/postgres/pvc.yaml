@@ -4,7 +4,7 @@ kind: PersistentVolume
 apiVersion: v1
 metadata:
   name: {{ $name }}-pv-volume
-  namespace: {{ .Values.metadata.namespace }}
+  namespace: {{.Release.Namespace}}
   labels:
     type: local
     app: {{ $name }}
@@ -22,7 +22,7 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: {{ $name }}-pv-claim
-  namespace: {{ .Values.metadata.namespace }}
+  namespace: {{.Release.Namespace}}
   labels:
     app: {{ $name }}
 spec:

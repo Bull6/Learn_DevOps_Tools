@@ -5,7 +5,7 @@ nginx:
   container:
     image: nginx:latest
   port: 80
-  replicaset: 1
+  replicaCount: 1
 
 postgres:
   configMap:

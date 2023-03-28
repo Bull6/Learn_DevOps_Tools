@@ -4,7 +4,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: {{ $name }}
-  namespace: {{ .Values.metadata.namespace }}
+  namespace: {{.Release.Namespace}}
   labels:
     app: {{ $name }}
 spec:
@@ -28,9 +28,24 @@ spec:
             - configMapRef:
                 name: {{ $name }}
         volumeMounts:
-            - mountPath: /var/lib/postgresql/data
-              name: {{ $name }}-pvc
-      volumes:
-        - name: {{ $name }}-pvc
-          persistentVolumeClaim:
-            claimName: {{ $name }}-pv-claim
+        - name: storage
+          mountPath: /var/lib/postgresql/data/
+
+      #   volumeMounts:
+      #       - mountPath: /var/lib/postgresql/data
+      #         name: {{ $name }}-pvc
+      # volumes:
+      #   - name: {{ $name }}-pvc
+      #     persistentVolumeClaim:
+      #       claimName: {{ $name }}-pv-claim
+  volumeClaimTemplates:
+  - metadata:
+      name: storage
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: "1Gi"
+      storageClassName: "hostpath"
+

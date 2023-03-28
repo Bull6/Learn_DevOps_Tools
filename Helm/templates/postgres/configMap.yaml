@@ -4,7 +4,7 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: {{ $name }}
-  namespace: {{ .Values.metadata.namespace }}
+  namespace: {{.Release.Namespace}}
 data:
     {{- range $k, $v :=  .Values.postgres.configMap }}
     {{ $k }}: {{ $v }}
